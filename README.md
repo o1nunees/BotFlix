@@ -6,7 +6,7 @@ O n8n é uma plataforma de automação que permite conectar APIs, serviços e cr
 No BotFlix, ele é usado para:
 
 Integrar com a API de filmes (ex.: TMDB).
-
+Integrar com a API do Gemini
 Processar requisições dos usuários.
 
 Retornar recomendações personalizadas.
@@ -16,7 +16,7 @@ Instale o n8n localmente ou use a versão em nuvem.
 
 Importe o arquivo JSON do fluxo disponível neste repositório.
 
-Configure suas credenciais da API (TMDB ou outra).
+Configure suas credenciais da API do TMDB e do Gemini.
 
 Execute o fluxo e interaja com o bot.
 
