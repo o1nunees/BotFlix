@@ -1,0 +1,165 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "botflix",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -416,
+        -32
+      ],
+      "id": "d8246608-d41c-422a-9ef7-060bfed2ea18",
+      "name": "Webhook",
+      "webhookId": "fe2a790e-6192-49ee-8c09-847fea794aec"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        416,
+        -32
+      ],
+      "id": "d990ea0e-8182-497b-9419-248d67eb985e",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.userPrompt }}",
+        "options": {
+          "systemMessage": "Você é um assistente especializado em indicar filmes reais e atuais.\n\nQuando o usuário pedir uma recomendação, você deve buscar mentalmente 1 filme que exista de verdade e que se encaixem na categoria solicitada.\n\nRegras:\n\n- Não invente nomes de filmes.\n- Priorize títulos populares e bem avaliados.\n- Retorne somente 1 filme por vez.\n\nFORMATO DE RESPOSTA OBRIGATÓRIO:\nResponda SOMENTE com este JSON (sem texto adicional):\n{\"title\": \"TÍTULO EXATO DO FILME\"}\n\nREGRAS CRÍTICAS:\n\n- SEM texto antes ou depois do JSON\n- SEM explicações ou comentários\n- SEM backticks ou markdown\n- SEM a palavra \"output\"\n- APENAS o array JSON válido"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        -32
+      ],
+      "id": "76b05b2c-22df-4e80-a0c4-5f4097714596",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        176
+      ],
+      "id": "a245ca1c-a7db-456f-a089-62c7984dbc54",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YchESGdDVdAtTkFq",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.themoviedb.org/3/search/movie",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ JSON.parse($json.output).title }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        192,
+        -32
+      ],
+      "id": "8797d4c5-c578-476a-bfe5-80cc36793880",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "3qCvOIHpVbj4QOo5",
+          "name": "Bearer Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1a102780-da11-4ad3-95f6-02061f6724d7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6be9a172ab5817c75290dd72f813fbcc7cc17146e222c020de0a1cbb5a13d509"
+  },
+  "id": "YDQSvysHakAQZe7I",
+  "tags": []
+}
